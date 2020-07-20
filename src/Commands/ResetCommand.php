@@ -43,6 +43,12 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      * - Reset git to certain point of history
      * - Delete all "pantheon_test_*" and "pantheon_live_*" tags
      * - Commit and force push to repo
+     * 
+     * Example usage:
+     * terminus envr foo 69cad75587a22c278e commitlog.csv
+     * 
+     * This would reset the "foo" environment back to commit 69cad75587a22c278e, 
+     * and then rebuild commits based on commitlog.csv.
      *
      * @command env:reset
      * @aliases envr
@@ -53,7 +59,18 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      */
     public function resetCommand($site_env_id, $commit, $commit_log)
     {
-        echo "todo";
+        // Reset history back to the commit passed.
+        $this->passthru('git reset --hard ' . $commit);
+
+        // Get our commit log into an array.
+        $commits = $csv = array_map('str_getcsv', file($commit_log));
+
+        foreach ($commits as $commit) {
+            $this->passthru('echo "Adding ' . $commit[0] . '" >> log.txt');
+            $this->passthru('git add log.txt');
+            $this->passthru('git commit -m "' . $commit[0] . '"');
+        }
+
     }
 
     protected function passthru($command)
