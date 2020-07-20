@@ -35,10 +35,8 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
     /**
      * Reset a Pantheon site to a given commit.
      * 
-     * My process has involved restoring from a backup in Dev, 
-     * deploying all the way up to Live, 
-     * then cloning the database+files from Dev to Live. Then create a new backup. That part is easy, but time consuming.
-     * 
+     * Run this command from within a Panthoen site repo cloned locally.
+     *
      * Steps to take:
      * - Reset git to certain point of history
      * - Delete all "pantheon_test_*" and "pantheon_live_*" tags
@@ -60,8 +58,16 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      * @param string $commit_log The text file to use for a fake commit log
      *   See the commitlog-example.csv for a template how this should be setup.
      */
-    public function resetCommand($site_env_id, $commit, $commit_log)
+    public function resetCommand($site_env_id, $commit, $commit_log, $db_url)
     {
+        // Get the site repo
+        list($site, $env) = $this->getSiteEnv($site_env_id);
+        $env_id = $env->getName();
+        $siteInfo = $site->serialize();
+        $site_id = $siteInfo['id'];
+        $repo_path = "ssh://codeserver.dev.$site_id@codeserver.dev.$site_id.drush.in:2222/~/repository.git";
+
+
         // Reset history back to the commit passed.
         $this->passthru('git reset --hard ' . $commit);
 
@@ -76,6 +82,12 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
             $this->passthru('git add log.txt');
             $this->passthru('git commit -m "' . $commit[0] . '"');
         }
+        
+        // Force push changes to Pantheon.
+        $this->passthru('git remote remove pantheon');
+        $this->passthru('git remote add pantheon ' . $repo_path);
+        $this->passthru('git push pantheon master --force');
+
 
     }
 
