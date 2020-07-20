@@ -55,15 +55,21 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      *
      * @param string $site_env_id Source site to clone
      * @param string $commit The commit hash to reset to.
+     *   This is built on a model that the commit resetting to is a "breaking commit". This 
+     * commit is rewritten to the current date/time of the command executing.
      * @param string $commit_log The text file to use for a fake commit log
+     *   See the commitlog-example.csv for a template how this should be setup.
      */
     public function resetCommand($site_env_id, $commit, $commit_log)
     {
         // Reset history back to the commit passed.
         $this->passthru('git reset --hard ' . $commit);
 
+        // Rewrite this breaking commit to be recent.
+        $this->passthru('GIT_COMMITTER_DATE="$(date)" git commit --amend --no-edit --date "$(date)"');
+
         // Get our commit log into an array.
-        $commits = $csv = array_map('str_getcsv', file($commit_log));
+        $commits = array_map('str_getcsv', file($commit_log));
 
         foreach ($commits as $commit) {
             $this->passthru('echo "Adding ' . $commit[0] . '" >> log.txt');
