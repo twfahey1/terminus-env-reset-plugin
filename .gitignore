@@ -1,0 +1,6 @@
+vendor
+bats
+phpcs
+bin
+libexec
+share

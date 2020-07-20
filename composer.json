@@ -1,0 +1,14 @@
+{
+    "name": "tylerfahey/terminus-reset-plugin",
+    "description": "Terminus Reset plugin - Provides resetting an environment to a desired state for demoing.",
+    "license": "MIT",
+    "type": "terminus-plugin",
+    "autoload": {
+        "psr-4": { "Pantheon\\TerminusEnvReset\\": "src" }
+    },
+    "extra": {
+        "terminus": {
+            "compatible-version": "^1|^2"
+        }
+    }
+}
