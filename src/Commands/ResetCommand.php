@@ -58,15 +58,20 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      * @param string $commit_log The text file to use for a fake commit log
      *   See the commitlog-example.csv for a template how this should be setup.
      */
-    public function resetCommand($site_env_id, $commit, $commit_log, $db_url)
+    public function resetCommand($site_env_id, $commit, $commit_log)
     {
         // Get the site repo
         list($site, $env) = $this->getSiteEnv($site_env_id);
         $env_id = $env->getName();
         $siteInfo = $site->serialize();
+        print_r($siteInfo);
+
         $site_id = $siteInfo['id'];
         $repo_path = "ssh://codeserver.dev.$site_id@codeserver.dev.$site_id.drush.in:2222/~/repository.git";
 
+        // Restore DB from url.
+        $clone_op = "terminus env:clone-content " . $siteInfo['name'] . ".demo " . " dev -y";
+        exec($clone_op);
 
         // Reset history back to the commit passed.
         $this->passthru('git reset --hard ' . $commit);
@@ -82,11 +87,12 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
             $this->passthru('git add log.txt');
             $this->passthru('git commit -m "' . $commit[0] . '"');
         }
-        
+
         // Force push changes to Pantheon.
         $this->passthru('git remote remove pantheon');
         $this->passthru('git remote add pantheon ' . $repo_path);
         $this->passthru('git push pantheon master --force');
+
 
 
     }
