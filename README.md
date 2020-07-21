@@ -11,10 +11,10 @@ git commands against this local copy and force pushing them to the site environm
 This will reset the environment to the commit `82bc552e230fa972e2`, which we would assume is a "breaking commit", and it will subsequently build "dummy" commits by writing to `log.txt` file which will be in the sites docroot. It will then clone the `demo` multidev over to the `dev` environment.
 
 Before running:
-https://www.evernote.com/shard/s128/sh/11f64a19-678f-4bde-8431-52917d301623/19f5d870b4c93e2b/res/0706060a-c15e-4032-86c3-f0ad7b16b995
+https://www.evernote.com/shard/s128/client/snv?noteGuid=11f64a19-678f-4bde-8431-52917d301623&noteKey=19f5d870b4c93e2b&sn=https%3A%2F%2Fwww.evernote.com%2Fshard%2Fs128%2Fsh%2F11f64a19-678f-4bde-8431-52917d301623%2F19f5d870b4c93e2b&title=testreset%2B%257C%2BPantheon%2BDashboard
 
 After running:
-https://www.evernote.com/shard/s128/sh/1b69b787-f921-4de5-8ce1-ca98d316d496/97b6fdb532e702c2/res/0d70771d-64c4-40c4-9120-c540ac820022
+https://www.evernote.com/shard/s128/client/snv?noteGuid=1b69b787-f921-4de5-8ce1-ca98d316d496&noteKey=97b6fdb532e702c2&sn=https%3A%2F%2Fwww.evernote.com%2Fshard%2Fs128%2Fsh%2F1b69b787-f921-4de5-8ce1-ca98d316d496%2F97b6fdb532e702c2&title=testreset%2B%257C%2BPantheon%2BDashboard
 
 ## Configuration
 
