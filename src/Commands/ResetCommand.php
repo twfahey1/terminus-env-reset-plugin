@@ -60,6 +60,24 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
      */
     public function resetCommand($site_env_id, $commit, $commit_log)
     {
+        // Determine tags
+        $test_tags = shell_exec('git tag -l "*test*"');
+        $test_tags_array = preg_split('/\s+/', trim($test_tags));
+        $last_test_tag = end($test_tags_array);
+        $last_test_tag_breakdown = explode('_', $last_test_tag);
+        $last_test_tag_number = (int) end($last_test_tag_breakdown);
+        $new_tag_number_for_test = $last_test_tag_number + 1;
+
+        $live_tags = shell_exec('git tag -l "*live*"');
+        $live_tags_array = preg_split('/\s+/', trim($live_tags));
+        $last_live_tag = end($live_tags_array);
+        $last_live_tag_breakdown = explode('_', $last_live_tag);
+        $last_live_tag_number = (int) end($last_live_tag_breakdown);
+        $new_tag_number_for_live = $last_live_tag_number + 1;
+        
+        $live_tag = "pantheon_live_" . $new_tag_number_for_live;
+        $test_tag = "pantheon_test_" . $new_tag_number_for_test;
+
         // Get the site repo
         list($site, $env) = $this->getSiteEnv($site_env_id);
         $env_id = $env->getName();
@@ -79,6 +97,10 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
         // Rewrite this breaking commit to be recent.
         $this->passthru('GIT_COMMITTER_DATE="$(date)" git commit --amend --no-edit --date "$(date)"');
 
+        // Tag breaking commit for deploy to test/live
+        $this->passthru('git tag ' . $live_tag);
+        $this->passthru('git tag ' . $test_tag);
+        
         // Get our commit log into an array.
         $commits = array_map('str_getcsv', file($commit_log));
 
@@ -91,7 +113,7 @@ class ResetCommand extends TerminusCommand implements SiteAwareInterface
         // Force push changes to Pantheon.
         $this->passthru('git remote remove pantheon');
         $this->passthru('git remote add pantheon ' . $repo_path);
-        $this->passthru('git push pantheon master --force');
+        $this->passthru('git push pantheon master --force --tags');
 
 
 
